@@ -1,0 +1,17 @@
+.{
+    .name = .imgui,
+    .version = "0.0.1",
+    .dependencies = .{
+        .imgui = .{
+            .url = "../imgui-1.92.5.zip",
+            .hash = "N-V-__8AALp9cwA8tEuEno2YCZyivsMaobnF-Z7qZGY3qBOt",
+        },
+        .dear_bindings = .{
+            .url = "../dear_bindings-DearBindings_v0.17_ImGui_v1.92.5.zip",
+            .hash = "N-V-__8AAMhuCABFyuSTmFllWg_gdOyeibwDUO2gfaPrP65l",
+        },
+    },
+    .minimum_zig_version = "0.16.0-dev.2193+fc517bd01",
+    .paths = .{""},
+    .fingerprint = 0xb0f2441511e002c0,
+}
