@@ -51,7 +51,7 @@ CIMGUI_IMPL_API void cimgui::cImGui_ImplDX11_InvalidateDeviceObjects(void)
 
 CIMGUI_IMPL_API void cimgui::cImGui_ImplDX11_UpdateTexture(ImTextureData* tex)
 {
-    ::ImGui_ImplDX11_UpdateTexture(tex);
+    ::ImGui_ImplDX11_UpdateTexture(reinterpret_cast<::ImTextureData*>(tex));
 }
 
 #endif // #ifndef IMGUI_DISABLE
