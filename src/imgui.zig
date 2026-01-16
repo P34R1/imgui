@@ -1,39 +1,3 @@
-const c = @import("c");
-pub const IO = c.ImGuiIO;
-pub const newFrame = c.ImGui_NewFrame;
-pub const render = c.ImGui_Render;
-pub const GetDrawData = c.ImGui_GetDrawData;
-pub const GetIO = c.ImGui_GetIO;
-pub const StyleColorsDark = c.ImGui_StyleColorsDark;
-
-pub const ImplDX11 = struct {
-    pub const CreateDeviceObjects = c.cImGui_ImplDX11_CreateDeviceObjects;
-    pub const InvalidateDeviceObjects = c.cImGui_ImplDX11_InvalidateDeviceObjects;
-
-    pub const Init = c.cImGui_ImplDX11_Init;
-    pub const Shutdown = c.cImGui_ImplDX11_Shutdown;
-
-    pub const NewFrame = c.cImGui_ImplDX11_NewFrame;
-    pub const RenderDrawData = c.cImGui_ImplDX11_RenderDrawData;
-};
-
-pub const ImplWin32 = struct {
-    pub const Init = c.cImGui_ImplWin32_Init;
-    pub const Shutdown = c.cImGui_ImplWin32_Shutdown;
-
-    pub const NewFrame = c.cImGui_ImplWin32_NewFrame;
-    pub const WndProcHandler = c.cImGui_ImplWin32_WndProcHandler;
-};
-
-pub fn createContext(shared_font_atlas: ?*c.ImFontAtlas) ?*c.ImGuiContext {
-    return c.ImGui_CreateContext(shared_font_atlas);
-}
-
-pub fn destroyContext(ctx: ?*c.ImGuiContext) void {
-    return c.ImGui_DestroyContext(ctx);
-}
-
-/// Windows
 /// - Begin() = push window to the stack and start appending to it. End() = pop window from the stack.
 /// - Passing 'bool* p_open != NULL' shows a window-closing widget in the upper-right corner of the window,
 ///   which clicking will set the boolean to false when clicked.
@@ -48,11 +12,16 @@ pub fn destroyContext(ctx: ?*c.ImGuiContext) void {
 pub fn begin(name: [*:0]const u8, p_open: ?*bool, flags: c_int) bool {
     return c.ImGui_Begin(name, p_open, flags);
 }
+
 pub fn end() void {
     c.ImGui_End();
 }
 
-pub const Text = @extern(*const fn (fmt: [*:0]const u8, ...) callconv(.c) void, .{ .name = "ImGui_Text" });
+pub fn text(comptime fmt: []const u8, args: anytype) error{NoSpaceLeft}!void {
+    var buf: [4096]u8 = undefined;
+    const txt = try std.fmt.bufPrint(&buf, fmt, args);
+    c.ImGui_TextUnformattedEx(txt.ptr, txt.ptr + txt.len);
+}
 
 pub const Col = packed struct {
     r: u8 = 0,
@@ -86,18 +55,18 @@ pub const Vec2 = struct {
     }
 };
 
-pub const DrawList = extern struct {
-    inner: c.ImDrawList,
+const std = @import("std");
 
-    pub fn getForeground() *@This() {
-        return @ptrCast(c.ImGui_GetForegroundDrawList());
-    }
+const c = @import("c");
+pub const IO = c.ImGuiIO;
+pub const newFrame = c.ImGui_NewFrame;
+pub const render = c.ImGui_Render;
+pub const GetDrawData = c.ImGui_GetDrawData;
+pub const GetIO = c.ImGui_GetIO;
+pub const StyleColorsDark = c.ImGui_StyleColorsDark;
+pub const createContext = c.ImGui_CreateContext;
+pub const destroyContext = c.ImGui_DestroyContext;
 
-    pub fn getBackground() *@This() {
-        return @ptrCast(c.ImGui_GetBackgroundDrawList());
-    }
-
-    pub fn addRectEx(self: *@This(), min: Vec2, max: Vec2, col: Col, rounding: f32, flags: c.ImDrawFlags, thickness: f32) void {
-        return c.ImDrawList_AddRectEx(@ptrCast(self), min.into(), max.into(), col.into(), rounding, flags, thickness);
-    }
-};
+pub const DrawList = @import("DrawList.zig");
+pub const impl_dx11 = @import("impl_dx11.zig");
+pub const impl_win32 = @import("impl_win32.zig");
