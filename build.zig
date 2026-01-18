@@ -44,6 +44,8 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
+    b.getInstallStep().dependOn(&dcimgui.step);
+
     mod.addIncludePath(imgui.path(""));
     mod.addIncludePath(imgui.path("backends"));
     mod.addIncludePath(b.path("generated"));
