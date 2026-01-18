@@ -24,6 +24,7 @@ pub fn build(b: *std.Build) void {
     const header = b.option([]const u8, "header", "Addition to the header making up the exported c module.") orelse "";
     const dcimgui = b.addTranslateC(.{ .target = target, .optimize = optimize, .root_source_file = b.addWriteFiles().add("headers.hpp", b.fmt(
         \\#define WIN32_LEAN_AND_MEAN
+        \\#include <d3d11.h>
         \\{s}
         \\#define IMGUI_BACKEND_HAS_WINDOWS_H
         \\#include <dcimgui.h>
@@ -64,6 +65,13 @@ pub fn build(b: *std.Build) void {
         "backends/imgui_impl_dx11.cpp",
         "backends/imgui_impl_win32.cpp",
     } });
+
+    const lib = b.addLibrary(.{
+        .name = "imgui",
+        .root_module = mod,
+    });
+
+    b.installArtifact(lib);
 }
 
 const backends = .{ "dx11", "win32" };
