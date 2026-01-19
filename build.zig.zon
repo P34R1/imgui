@@ -3,11 +3,11 @@
     .version = "0.0.1",
     .dependencies = .{
         .imgui = .{
-            .url = "https://github.com/ocornut/imgui/archive/refs/heads/master.tar.gz",
-            .hash = "N-V-__8AAP82dQCQbKTHlJ5oor5IWrKyfeDX0ahltp4osP9R",
+            .url = "git+https://github.com/ocornut/imgui#8b86c939c7eb5346784d1030102f2236a3bd547c",
+            .hash = "N-V-__8AAMggdQDMlRQ31-z19-z9ja_KKnW0iUKS8npcN2pV",
         },
         .dear_bindings = .{
-            .url = "https://github.com/dearimgui/dear_bindings/archive/refs/heads/main.tar.gz",
+            .url = "git+https://github.com/dearimgui/dear_bindings#c8049278a3dcda45dea93555534c8cab250d566b",
             .hash = "N-V-__8AADrXCAA2dA61i058pjoYHMhUPzM35yUsvZwYQ-nv",
         },
     },
