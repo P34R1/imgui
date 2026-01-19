@@ -1,3 +1,5 @@
+const std = @import("std");
+
 const c = @import("c");
 
 const imgui = @import("imgui.zig");
@@ -97,4 +99,8 @@ pub fn getBackground() *@This() {
 
 pub fn into(self: *@This()) *c.ImDrawList {
     return &self.inner;
+}
+
+test {
+    std.testing.refAllDecls(@This());
 }

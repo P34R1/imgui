@@ -15,10 +15,6 @@ pub const DrawList = @import("DrawList.zig");
 pub const impl_dx11 = @import("impl_dx11.zig");
 pub const impl_win32 = @import("impl_win32.zig");
 
-test {
-    std.testing.refAllDeclsRecursive(@This());
-}
-
 /// - Begin() = push window to the stack and start appending to it. End() = pop window from the stack.
 /// - Passing 'bool* p_open != NULL' shows a window-closing widget in the upper-right corner of the window,
 ///   which clicking will set the boolean to false when clicked.
@@ -71,3 +67,7 @@ pub const Vec2 = struct {
         return .{ .x = self.x, .y = self.y };
     }
 };
+
+test {
+    std.testing.refAllDecls(@This());
+}
