@@ -8,8 +8,7 @@
 #include <stdio.h>
 
 // Wrap this in a namespace to keep it separate from the C++ API
-namespace cimgui
-{
+namespace cimgui {
 #include "dx11.h"
 }
 
@@ -19,39 +18,36 @@ namespace cimgui
 
 #ifndef IMGUI_DISABLE
 
-CIMGUI_IMPL_API bool cimgui::cImGui_ImplDX11_Init(ID3D11Device* device, ID3D11DeviceContext* device_context)
-{
+CIMGUI_IMPL_API bool
+cimgui::cImGui_ImplDX11_Init(ID3D11Device *device,
+                             ID3D11DeviceContext *device_context) {
     return ::ImGui_ImplDX11_Init(device, device_context);
 }
 
-CIMGUI_IMPL_API void cimgui::cImGui_ImplDX11_Shutdown(void)
-{
+CIMGUI_IMPL_API void cimgui::cImGui_ImplDX11_Shutdown(void) {
     ::ImGui_ImplDX11_Shutdown();
 }
 
-CIMGUI_IMPL_API void cimgui::cImGui_ImplDX11_NewFrame(void)
-{
+CIMGUI_IMPL_API void cimgui::cImGui_ImplDX11_NewFrame(void) {
     ::ImGui_ImplDX11_NewFrame();
 }
 
-CIMGUI_IMPL_API void cimgui::cImGui_ImplDX11_RenderDrawData(cimgui::ImDrawData* draw_data)
-{
-    ::ImGui_ImplDX11_RenderDrawData(reinterpret_cast<::ImDrawData*>(draw_data));
+CIMGUI_IMPL_API void
+cimgui::cImGui_ImplDX11_RenderDrawData(cimgui::ImDrawData *draw_data) {
+    ::ImGui_ImplDX11_RenderDrawData(
+        reinterpret_cast<::ImDrawData *>(draw_data));
 }
 
-CIMGUI_IMPL_API bool cimgui::cImGui_ImplDX11_CreateDeviceObjects(void)
-{
+CIMGUI_IMPL_API bool cimgui::cImGui_ImplDX11_CreateDeviceObjects(void) {
     return ::ImGui_ImplDX11_CreateDeviceObjects();
 }
 
-CIMGUI_IMPL_API void cimgui::cImGui_ImplDX11_InvalidateDeviceObjects(void)
-{
+CIMGUI_IMPL_API void cimgui::cImGui_ImplDX11_InvalidateDeviceObjects(void) {
     ::ImGui_ImplDX11_InvalidateDeviceObjects();
 }
 
-CIMGUI_IMPL_API void cimgui::cImGui_ImplDX11_UpdateTexture(ImTextureData* tex)
-{
-    ::ImGui_ImplDX11_UpdateTexture(reinterpret_cast<::ImTextureData*>(tex));
+CIMGUI_IMPL_API void cimgui::cImGui_ImplDX11_UpdateTexture(ImTextureData *tex) {
+    ::ImGui_ImplDX11_UpdateTexture(reinterpret_cast<::ImTextureData *>(tex));
 }
 
 #endif // #ifndef IMGUI_DISABLE
