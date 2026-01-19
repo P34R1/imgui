@@ -3,12 +3,12 @@
     .version = "0.0.1",
     .dependencies = .{
         .imgui = .{
-            .url = "../imgui-1.92.5.zip",
-            .hash = "N-V-__8AALp9cwA8tEuEno2YCZyivsMaobnF-Z7qZGY3qBOt",
+            .url = "https://github.com/ocornut/imgui/archive/refs/heads/master.tar.gz",
+            .hash = "N-V-__8AAP82dQCQbKTHlJ5oor5IWrKyfeDX0ahltp4osP9R",
         },
         .dear_bindings = .{
-            .url = "../dear_bindings-DearBindings_v0.17_ImGui_v1.92.5.zip",
-            .hash = "N-V-__8AAMhuCABFyuSTmFllWg_gdOyeibwDUO2gfaPrP65l",
+            .url = "https://github.com/dearimgui/dear_bindings/archive/refs/heads/main.tar.gz",
+            .hash = "N-V-__8AADrXCAA2dA61i058pjoYHMhUPzM35yUsvZwYQ-nv",
         },
     },
     .minimum_zig_version = "0.16.0-dev.2193+fc517bd01",
