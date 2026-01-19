@@ -1,3 +1,7 @@
+test {
+    std.testing.refAllDeclsRecursive(@This());
+}
+
 /// - Begin() = push window to the stack and start appending to it. End() = pop window from the stack.
 /// - Passing 'bool* p_open != NULL' shows a window-closing widget in the upper-right corner of the window,
 ///   which clicking will set the boolean to false when clicked.

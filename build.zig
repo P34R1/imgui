@@ -68,12 +68,8 @@ pub fn build(b: *std.Build) void {
         "backends/imgui_impl_win32.cpp",
     } });
 
-    const lib = b.addLibrary(.{
-        .name = "imgui",
-        .root_module = mod,
-    });
-
-    b.installArtifact(lib);
+    const tests = b.addRunArtifact(b.addTest(.{ .root_module = mod }));
+    b.getInstallStep().dependOn(&tests.step);
 }
 
 const backends = .{ "dx11", "win32" };
