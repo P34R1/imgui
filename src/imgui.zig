@@ -1,3 +1,20 @@
+const std = @import("std");
+
+const c = @import("c");
+pub const IO = c.ImGuiIO;
+pub const newFrame = c.ImGui_NewFrame;
+pub const render = c.ImGui_Render;
+pub const GetDrawData = c.ImGui_GetDrawData;
+pub const GetIO = c.ImGui_GetIO;
+pub const StyleColorsDark = c.ImGui_StyleColorsDark;
+pub const createContext = c.ImGui_CreateContext;
+pub const destroyContext = c.ImGui_DestroyContext;
+pub const end = c.ImGui_End;
+
+pub const DrawList = @import("DrawList.zig");
+pub const impl_dx11 = @import("impl_dx11.zig");
+pub const impl_win32 = @import("impl_win32.zig");
+
 test {
     std.testing.refAllDeclsRecursive(@This());
 }
@@ -17,13 +34,9 @@ pub fn begin(name: [*:0]const u8, p_open: ?*bool, flags: c_int) bool {
     return c.ImGui_Begin(name, p_open, flags);
 }
 
-pub fn end() void {
-    c.ImGui_End();
-}
-
-pub fn text(comptime fmt: []const u8, args: anytype) error{NoSpaceLeft}!void {
-    var buf: [4096]u8 = undefined;
-    const txt = try std.fmt.bufPrint(&buf, fmt, args);
+pub fn text(comptime fmt: []const u8, args: anytype) void {
+    var buf: [8192]u8 = undefined;
+    const txt = std.fmt.bufPrint(&buf, fmt, args) catch unreachable;
     c.ImGui_TextUnformattedEx(txt.ptr, txt.ptr + txt.len);
 }
 
@@ -58,19 +71,3 @@ pub const Vec2 = struct {
         return .{ .x = self.x, .y = self.y };
     }
 };
-
-const std = @import("std");
-
-const c = @import("c");
-pub const IO = c.ImGuiIO;
-pub const newFrame = c.ImGui_NewFrame;
-pub const render = c.ImGui_Render;
-pub const GetDrawData = c.ImGui_GetDrawData;
-pub const GetIO = c.ImGui_GetIO;
-pub const StyleColorsDark = c.ImGui_StyleColorsDark;
-pub const createContext = c.ImGui_CreateContext;
-pub const destroyContext = c.ImGui_DestroyContext;
-
-pub const DrawList = @import("DrawList.zig");
-pub const impl_dx11 = @import("impl_dx11.zig");
-pub const impl_win32 = @import("impl_win32.zig");
