@@ -8,48 +8,49 @@ const Col = imgui.Col;
 
 inner: c.ImDrawList,
 
-pub const Shape = union(enum) {
-    _line: struct { p1: Vec2, p2: Vec2, ex: LineEx },
-    _rect: struct { min: Vec2, max: Vec2, ex: RectEx },
-    _triangle: struct { p1: Vec2, p2: Vec2, p3: Vec2, ex: TriangleEx },
-    _quad: struct { p1: Vec2, p2: Vec2, p3: Vec2, p4: Vec2, ex: QuadEx },
-    _circle: struct { center: Vec2, radius: f32, ex: CircleEx },
-    _ellipse: struct { center: Vec2, radius: Vec2, ex: EllipseEx },
-    _ngon: struct { center: Vec2, radius: f32, num_segments: c_int, ex: NgonEx },
+/// wrapper for c.ImDrawList_AddShapeEx
+pub const Shape = struct {
+    /// `null` means filled shape.
+    thickness: ?f32,
+    inner: union(enum) {
+        line: struct { p1: Vec2, p2: Vec2 },
+        rect: struct { min: Vec2, max: Vec2, ex: RectEx },
+        triangle: struct { p1: Vec2, p2: Vec2, p3: Vec2 },
+        quad: struct { p1: Vec2, p2: Vec2, p3: Vec2, p4: Vec2 },
+        circle: struct { center: Vec2, radius: f32, ex: CircleEx },
+        ellipse: struct { center: Vec2, radius: Vec2, ex: EllipseEx },
+        ngon: struct { center: Vec2, radius: f32, num_segments: c_int },
+    },
 
-    pub const LineEx = struct { thickness: f32 = 1 };
-    pub fn line(p1: Vec2, p2: Vec2, ex: LineEx) @This() {
-        return Shape{ ._line = .{ .p1 = p1, .p2 = p2, .ex = ex } };
+    pub fn line(p1: Vec2, p2: Vec2, thickness: f32) @This() {
+        return @This(){ .thickness = thickness, .inner = .line{ .p1 = p1, .p2 = p2 } };
     }
 
-    pub const RectEx = struct { rounding: f32 = 0, flags: c.ImDrawFlags = 0, thickness: f32 = 1 };
-    pub fn rect(min: Vec2, max: Vec2, ex: RectEx) @This() {
-        return Shape{ ._rect = .{ .min = min, .max = max, .ex = ex } };
+    pub const RectEx = struct { rounding: f32 = 0, flags: c.ImDrawFlags = 0 };
+    pub fn rect(min: Vec2, max: Vec2, thickness: ?f32, ex: RectEx) @This() {
+        return @This(){ .thickness = thickness, .inner = .rect{ .min = min, .max = max, .ex = ex } };
     }
 
-    pub const TriangleEx = struct { thickness: f32 = 1 };
-    pub fn triangle(p1: Vec2, p2: Vec2, p3: Vec2, ex: TriangleEx) @This() {
-        return Shape{ ._triangle = .{ .p1 = p1, .p2 = p2, .p3 = p3, .ex = ex } };
+    pub fn triangle(p1: Vec2, p2: Vec2, p3: Vec2, thickness: ?f32) @This() {
+        return @This(){ .thickness = thickness, .inner = .triangle{ .p1 = p1, .p2 = p2, .p3 = p3 } };
     }
 
-    pub const QuadEx = struct { thickness: f32 = 1 };
-    pub fn quad(p1: Vec2, p2: Vec2, p3: Vec2, p4: Vec2, ex: QuadEx) @This() {
-        return Shape{ ._quad = .{ .p1 = p1, .p2 = p2, .p3 = p3, .p4 = p4, .ex = ex } };
+    pub fn quad(p1: Vec2, p2: Vec2, p3: Vec2, p4: Vec2, thickness: ?f32) @This() {
+        return @This(){ .thickness = thickness, .inner = .quad{ .p1 = p1, .p2 = p2, .p3 = p3, .p4 = p4 } };
     }
 
-    pub const CircleEx = struct { num_segments: c_int = 0, thickness: f32 = 1 };
-    pub fn circle(center: Vec2, radius: f32, ex: CircleEx) @This() {
-        return Shape{ ._circle = .{ .center = center, .radius = radius, .ex = ex } };
+    pub const CircleEx = struct { num_segments: c_int = 0 };
+    pub fn circle(center: Vec2, radius: f32, thickness: ?f32, ex: CircleEx) @This() {
+        return @This(){ .thickness = thickness, .inner = .circle{ .center = center, .radius = radius, .ex = ex } };
     }
 
-    pub const EllipseEx = struct { rot: f32 = 0, num_segments: c_int = 0, thickness: f32 = 1 };
-    pub fn ellipse(center: Vec2, radius: Vec2, ex: EllipseEx) @This() {
-        return Shape{ ._ellipse = .{ .center = center, .radius = radius, .ex = ex } };
+    pub const EllipseEx = struct { rot: f32 = 0, num_segments: c_int = 0 };
+    pub fn ellipse(center: Vec2, radius: Vec2, thickness: ?f32, ex: EllipseEx) @This() {
+        return @This(){ .thickness = thickness, .inner = .ellipse{ .center = center, .radius = radius, .ex = ex } };
     }
 
-    pub const NgonEx = struct { thickness: f32 = 1 };
-    pub fn ngon(center: Vec2, radius: f32, num_segments: c_int, ex: NgonEx) @This() {
-        return Shape{ ._ngon = .{ .center = center, .radius = radius, .num_segments = num_segments, .ex = ex } };
+    pub fn ngon(center: Vec2, radius: f32, num_segments: c_int, thickness: ?f32) @This() {
+        return @This(){ .thickness = thickness, .inner = .ngon{ .center = center, .radius = radius, .num_segments = num_segments } };
     }
 };
 
@@ -60,32 +61,37 @@ pub const Shape = union(enum) {
 //   In older versions (until Dear ImGui 1.77) the AddCircle functions defaulted to num_segments == 12.
 //   In future versions we will use textures to provide cheaper and higher-quality circles.
 //   Use AddNgon() and AddNgonFilled() functions if you need to guarantee a specific number of sides
-pub fn add(self: *@This(), shape: Shape, colour: Col, filled: bool) void {
-    if (filled)
-        return addFilled(self, shape, colour);
+pub fn add(drawlist: *@This(), shape: Shape, colour: Col) void {
+    const thickness = shape.thickness orelse return addFilled(drawlist, shape, colour);
 
     const col = colour.into();
-    switch (shape) {
-        ._line => |s| c.ImDrawList_AddLineEx(self.into(), s.p1.into(), s.p2.into(), col, s.ex.thickness),
-        ._rect => |s| c.ImDrawList_AddRectEx(self.into(), s.min.into(), s.max.into(), col, s.ex.rounding, s.ex.flags, s.ex.thickness),
-        ._triangle => |s| c.ImDrawList_AddTriangleEx(self.into(), s.p1.into(), s.p2.into(), s.p3.into(), col, s.ex.thickness),
-        ._quad => |s| c.ImDrawList_AddQuadEx(self.into(), s.p1.into(), s.p2.into(), s.p3.into(), s.p4.into(), col, s.ex.thickness),
-        ._circle => |s| c.ImDrawList_AddCircleEx(self.into(), s.center.into(), s.radius, col, s.ex.num_segments, s.ex.thickness),
-        ._ellipse => |s| c.ImDrawList_AddEllipseEx(self.into(), s.center.into(), s.radius.into(), col, s.ex.rot, s.ex.num_segments, s.ex.thickness),
-        ._ngon => |s| c.ImDrawList_AddNgonEx(self.into(), s.center.into(), s.radius, col, s.num_segments, s.ex.thickness),
+    const self = drawlist.into();
+
+    switch (shape.inner) {
+        .line => |s| c.ImDrawList_AddLineEx(self, s.p1.into(), s.p2.into(), col, thickness),
+        .rect => |s| c.ImDrawList_AddRectEx(self, s.min.into(), s.max.into(), col, s.ex.rounding, s.ex.flags, thickness),
+        .triangle => |s| c.ImDrawList_AddTriangleEx(self, s.p1.into(), s.p2.into(), s.p3.into(), col, thickness),
+        .quad => |s| c.ImDrawList_AddQuadEx(self, s.p1.into(), s.p2.into(), s.p3.into(), s.p4.into(), col, thickness),
+        .circle => |s| c.ImDrawList_AddCircleEx(self, s.center.into(), s.radius, col, s.ex.num_segments, thickness),
+        .ellipse => |s| c.ImDrawList_AddEllipseEx(self, s.center.into(), s.radius.into(), col, s.ex.rot, s.ex.num_segments, thickness),
+        .ngon => |s| c.ImDrawList_AddNgonEx(self, s.center.into(), s.radius, col, s.num_segments, thickness),
     }
 }
 
-pub fn addFilled(self: *@This(), shape: Shape, colour: Col) void {
+pub fn addFilled(drawlist: *@This(), shape: Shape, colour: Col) void {
+    std.debug.assert(shape.thickness == null);
+
     const col = colour.into();
-    switch (shape) {
-        ._line => unreachable,
-        ._rect => |s| c.ImDrawList_AddRectFilledEx(self.into(), s.min.into(), s.max.into(), col, s.ex.rounding, s.ex.flags),
-        ._triangle => |s| c.ImDrawList_AddTriangleFilled(self.into(), s.p1.into(), s.p2.into(), s.p3.into(), col),
-        ._quad => |s| c.ImDrawList_AddQuadFilled(self.into(), s.p1.into(), s.p2.into(), s.p3.into(), s.p4.into(), col),
-        ._circle => |s| c.ImDrawList_AddCircleFilled(self.into(), s.center.into(), s.radius, col, s.ex.num_segments),
-        ._ellipse => |s| c.ImDrawList_AddEllipseFilledEx(self.into(), s.center.into(), s.radius.into(), col, s.ex.rot, s.ex.num_segments),
-        ._ngon => |s| c.ImDrawList_AddNgonFilled(self.into(), s.center.into(), s.radius, col, s.num_segments),
+    const self = drawlist.into();
+
+    switch (shape.inner) {
+        .line => unreachable,
+        .rect => |s| c.ImDrawList_AddRectFilledEx(self, s.min.into(), s.max.into(), col, s.ex.rounding, s.ex.flags),
+        .triangle => |s| c.ImDrawList_AddTriangleFilled(self, s.p1.into(), s.p2.into(), s.p3.into(), col),
+        .quad => |s| c.ImDrawList_AddQuadFilled(self, s.p1.into(), s.p2.into(), s.p3.into(), s.p4.into(), col),
+        .circle => |s| c.ImDrawList_AddCircleFilled(self, s.center.into(), s.radius, col, s.ex.num_segments),
+        .ellipse => |s| c.ImDrawList_AddEllipseFilledEx(self, s.center.into(), s.radius.into(), col, s.ex.rot, s.ex.num_segments),
+        .ngon => |s| c.ImDrawList_AddNgonFilled(self, s.center.into(), s.radius, col, s.num_segments),
     }
 }
 
