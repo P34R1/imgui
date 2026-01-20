@@ -2,57 +2,12 @@ const std = @import("std");
 
 const c = @import("c");
 
+const Shape = @import("DrawList/Shape.zig");
 const imgui = @import("imgui.zig");
 const Vec2 = imgui.Vec2;
 const Col = imgui.Col;
 
 inner: c.ImDrawList,
-
-/// wrapper for c.ImDrawList_AddShapeEx
-pub const Shape = struct {
-    /// `null` means filled shape.
-    thickness: ?f32,
-    inner: union(enum) {
-        line: struct { p1: Vec2, p2: Vec2 },
-        rect: struct { min: Vec2, max: Vec2, ex: RectEx },
-        triangle: struct { p1: Vec2, p2: Vec2, p3: Vec2 },
-        quad: struct { p1: Vec2, p2: Vec2, p3: Vec2, p4: Vec2 },
-        circle: struct { center: Vec2, radius: f32, ex: CircleEx },
-        ellipse: struct { center: Vec2, radius: Vec2, ex: EllipseEx },
-        ngon: struct { center: Vec2, radius: f32, num_segments: c_int },
-    },
-
-    pub fn line(p1: Vec2, p2: Vec2, thickness: f32) @This() {
-        return @This(){ .thickness = thickness, .inner = .line{ .p1 = p1, .p2 = p2 } };
-    }
-
-    pub const RectEx = struct { rounding: f32 = 0, flags: c.ImDrawFlags = 0 };
-    pub fn rect(min: Vec2, max: Vec2, thickness: ?f32, ex: RectEx) @This() {
-        return @This(){ .thickness = thickness, .inner = .rect{ .min = min, .max = max, .ex = ex } };
-    }
-
-    pub fn triangle(p1: Vec2, p2: Vec2, p3: Vec2, thickness: ?f32) @This() {
-        return @This(){ .thickness = thickness, .inner = .triangle{ .p1 = p1, .p2 = p2, .p3 = p3 } };
-    }
-
-    pub fn quad(p1: Vec2, p2: Vec2, p3: Vec2, p4: Vec2, thickness: ?f32) @This() {
-        return @This(){ .thickness = thickness, .inner = .quad{ .p1 = p1, .p2 = p2, .p3 = p3, .p4 = p4 } };
-    }
-
-    pub const CircleEx = struct { num_segments: c_int = 0 };
-    pub fn circle(center: Vec2, radius: f32, thickness: ?f32, ex: CircleEx) @This() {
-        return @This(){ .thickness = thickness, .inner = .circle{ .center = center, .radius = radius, .ex = ex } };
-    }
-
-    pub const EllipseEx = struct { rot: f32 = 0, num_segments: c_int = 0 };
-    pub fn ellipse(center: Vec2, radius: Vec2, thickness: ?f32, ex: EllipseEx) @This() {
-        return @This(){ .thickness = thickness, .inner = .ellipse{ .center = center, .radius = radius, .ex = ex } };
-    }
-
-    pub fn ngon(center: Vec2, radius: f32, num_segments: c_int, thickness: ?f32) @This() {
-        return @This(){ .thickness = thickness, .inner = .ngon{ .center = center, .radius = radius, .num_segments = num_segments } };
-    }
-};
 
 // Primitives
 // - Filled shapes must always use clockwise winding order. The anti-aliasing fringe depends on it. Counter-clockwise shapes will have "inward" anti-aliasing.
