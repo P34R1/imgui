@@ -44,8 +44,6 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
-    b.getInstallStep().dependOn(&dcimgui.step);
-
     mod.addIncludePath(imgui.path(""));
     mod.addIncludePath(imgui.path("backends"));
     mod.addIncludePath(b.path("generated"));
@@ -58,6 +56,7 @@ pub fn build(b: *std.Build) void {
     mod.linkSystemLibrary("d3dcompiler_47", .{});
     mod.linkSystemLibrary("gdi32", .{});
     mod.linkSystemLibrary("dwmapi", .{});
+    mod.linkSystemLibrary("d3d11", .{});
     mod.addCSourceFiles(.{ .root = imgui.path(""), .files = &.{
         "imgui.cpp",
         "imgui_demo.cpp",
