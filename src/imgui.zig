@@ -1,12 +1,12 @@
 const std = @import("std");
 
 const c = @import("c");
-pub const IO = c.ImGuiIO;
+pub const Io = c.ImGuiIO;
 pub const newFrame = c.ImGui_NewFrame;
 pub const render = c.ImGui_Render;
-pub const GetDrawData = c.ImGui_GetDrawData;
-pub const GetIO = c.ImGui_GetIO;
-pub const StyleColorsDark = c.ImGui_StyleColorsDark;
+pub const getDrawData = c.ImGui_GetDrawData;
+pub const getIO = c.ImGui_GetIO;
+pub const styleColorsDark = c.ImGui_StyleColorsDark;
 pub const createContext = c.ImGui_CreateContext;
 pub const destroyContext = c.ImGui_DestroyContext;
 pub const end = c.ImGui_End;
@@ -26,7 +26,7 @@ pub const impl_win32 = @import("impl_win32.zig");
 ///    such as BeginMenu/EndMenu, BeginPopup/EndPopup, etc. where the EndXXX call should only be called if the corresponding
 ///    BeginXXX function returned true. Begin and BeginChild are the only odd ones out. Will be fixed in a future update.]
 /// - Note that the bottom of window stack always contains a window called "Debug".
-pub fn begin(name: [*:0]const u8, p_open: ?*bool, flags: c_int) bool {
+pub fn begin(name: [*:0]const u8, p_open: ?*bool, flags: c.ImGuiWindowFlags) bool {
     return c.ImGui_Begin(name, p_open, flags);
 }
 

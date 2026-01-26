@@ -33,7 +33,7 @@ pub fn add(drawlist: *@This(), shape: Shape, colour: Col) void {
     }
 }
 
-pub fn addFilled(drawlist: *@This(), shape: Shape, colour: Col) void {
+fn addFilled(drawlist: *@This(), shape: Shape, colour: Col) void {
     std.debug.assert(shape.thickness == null);
 
     const col = colour.into();
