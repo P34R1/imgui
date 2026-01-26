@@ -5,7 +5,7 @@ pub const Io = c.ImGuiIO;
 pub const newFrame = c.ImGui_NewFrame;
 pub const render = c.ImGui_Render;
 pub const getDrawData = c.ImGui_GetDrawData;
-pub const getIO = c.ImGui_GetIO;
+pub const getIo = c.ImGui_GetIO;
 pub const styleColorsDark = c.ImGui_StyleColorsDark;
 pub const createContext = c.ImGui_CreateContext;
 pub const destroyContext = c.ImGui_DestroyContext;
@@ -34,6 +34,10 @@ pub fn text(comptime fmt: []const u8, args: anytype) void {
     var buf: [8192]u8 = undefined;
     const txt = std.fmt.bufPrint(&buf, fmt, args) catch unreachable;
     c.ImGui_TextUnformattedEx(txt.ptr, txt.ptr + txt.len);
+}
+
+pub fn checkbox(label: []const u8, state: *bool) void {
+    _ = c.ImGui_Checkbox(label.ptr, state);
 }
 
 pub const Col = packed struct {
