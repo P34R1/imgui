@@ -12,11 +12,10 @@ pub const Line = shapes.Line;
 pub const Ngon = shapes.Ngon;
 pub const Quad = shapes.Quad;
 pub const Rect = shapes.Rect;
-pub const Text = shapes.Text;
 
 /// `null` means filled shape.
 thickness: ?f32,
-inner: union(enum) { line: Line, rect: Rect, triangle: Triangle, quad: Quad, circle: Circle, ellipse: Ellipse, ngon: Ngon, text: Text },
+inner: union(enum) { line: Line, rect: Rect, triangle: Triangle, quad: Quad, circle: Circle, ellipse: Ellipse, ngon: Ngon },
 
 pub fn line(p1: Vec2, p2: Vec2, thickness: f32) @This() {
     return @This(){ .thickness = thickness, .inner = .{ .line = .{ .p1 = p1, .p2 = p2 } } };
@@ -68,12 +67,6 @@ pub fn ngon(center: Vec2, radius: f32, num_segments: c_int, thickness: ?f32) @Th
 
 pub fn filledNgon(center: Vec2, radius: f32, num_segments: c_int) @This() {
     return ngon(center, radius, num_segments, null);
-}
-
-pub fn text(pos: Vec2, comptime fmt: []const u8, args: anytype) @This() {
-    var buf: [8192]u8 = undefined;
-    const txt = std.fmt.bufPrint(&buf, fmt, args) catch unreachable;
-    return @This(){ .thickness = 1, .inner = .{ .text = .{ .pos = pos, .buf = buf, .len = txt.len } } };
 }
 
 test {
