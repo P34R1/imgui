@@ -30,7 +30,7 @@ pub fn add(drawlist: *@This(), shape: Shape, colour: Col) void {
         .circle => |s| c.ImDrawList_AddCircleEx(self, s.center.into(), s.radius, col, s.ex.num_segments, thickness),
         .ellipse => |s| c.ImDrawList_AddEllipseEx(self, s.center.into(), s.radius.into(), col, s.ex.rot, s.ex.num_segments, thickness),
         .ngon => |s| c.ImDrawList_AddNgonEx(self, s.center.into(), s.radius, col, s.num_segments, thickness),
-        .text => |s| c.ImDrawList_AddTextEx(self, s.pos.into(), col, s.text.ptr, s.text.ptr + s.text.len),
+        .text => |s| c.ImDrawList_AddTextEx(self, s.pos.into(), col, &s.buf, @as([*]const u8, &s.buf) + s.len),
     }
 }
 

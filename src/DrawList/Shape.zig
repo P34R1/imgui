@@ -70,8 +70,10 @@ pub fn filledNgon(center: Vec2, radius: f32, num_segments: c_int) @This() {
     return ngon(center, radius, num_segments, null);
 }
 
-pub fn text(pos: Vec2, str: []const u8) @This() {
-    return @This(){ .thickness = 1, .inner = .{ .text = .{ .pos = pos, .text = str } } };
+pub fn text(pos: Vec2, comptime fmt: []const u8, args: anytype) @This() {
+    var buf: [8192]u8 = undefined;
+    const txt = std.fmt.bufPrint(&buf, fmt, args) catch unreachable;
+    return @This(){ .thickness = 1, .inner = .{ .text = .{ .pos = pos, .buf = buf, .len = txt.len } } };
 }
 
 test {

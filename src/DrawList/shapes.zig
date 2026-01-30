@@ -67,5 +67,6 @@ pub const Ngon = struct {
 
 pub const Text = struct {
     pos: Vec2,
-    text: []const u8,
+    buf: [8192]u8,
+    len: usize,
 };
