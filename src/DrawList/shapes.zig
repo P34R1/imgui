@@ -64,3 +64,8 @@ pub const Ngon = struct {
     radius: f32,
     num_segments: c_int,
 };
+
+pub const Text = struct {
+    pos: Vec2,
+    text: []const u8,
+};
