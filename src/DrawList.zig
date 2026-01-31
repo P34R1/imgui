@@ -2,7 +2,7 @@ const std = @import("std");
 
 const c = @import("c");
 
-const Shape = @import("DrawList/Shape.zig");
+pub const Shape = @import("DrawList/Shape.zig");
 const imgui = @import("imgui.zig");
 const Vec2 = imgui.Vec2;
 const Col = imgui.Col;
